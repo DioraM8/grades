@@ -319,106 +319,84 @@
             border: 1px solid rgba(255, 71, 87, 0.3);
         }
 
-        /* Grade Chart */
-        .grade-distribution {
-            margin-top: 40px;
-        }
-
-        .grade-chart-container {
-            background: rgba(0, 0, 0, 0.2);
+        /* Attendance Section */
+        .attendance-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
             padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            margin-top: 20px;
-            height: 300px;
-            position: relative;
         }
 
-        .bar-chart {
+        .attendance-stats {
             display: flex;
-            height: 220px;
-            align-items: flex-end;
-            gap: 20px;
-            padding-bottom: 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            justify-content: space-around;
-            position: relative;
+            gap: 30px;
         }
 
-        .bar-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            position: relative;
+        .attendance-item {
+            text-align: center;
         }
 
-        .bar {
-            width: 40px;
-            background: linear-gradient(to top, var(--primary), var(--primary-hover));
-            border-radius: 8px 8px 0 0;
-            position: relative;
-            transition: height 1s ease;
+        .attendance-value {
+            font-size: 32px;
+            font-weight: 700;
+            font-family: 'Syne', sans-serif;
+            margin-bottom: 8px;
         }
 
-        .bar-label {
-            position: absolute;
-            bottom: -25px;
-            font-size: 12px;
-            color: var(--text-mid);
-            white-space: nowrap;
+        .present {
+            color: #2ed573;
         }
 
-        .bar-value {
-            position: absolute;
-            bottom: calc(100% + 5px);
-            font-size: 12px;
-            font-weight: 600;
-            color: white;
+        .late {
+            color: #ff9f43;
         }
 
-        /* Legend */
-        .chart-legend {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
+        .absent {
+            color: #ff4757;
         }
 
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .attendance-label {
             font-size: 14px;
             color: var(--text-mid);
         }
 
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 3px;
+        .attendance-percentage {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Syne', sans-serif;
         }
 
-        .legend-assignments {
-            background: var(--primary);
-        }
-
-        /* Y-axis labels */
-        .y-axis {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 220px;
+        .attendance-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary) 0% 95%, rgba(255, 255, 255, 0.1) 95% 100%);
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 0 10px;
+            justify-content: center;
+            align-items: center;
+            position: relative;
         }
 
-        .y-label {
-            font-size: 12px;
-            color: var(--text-mid);
-            transform: translateY(-50%);
+        .attendance-circle::before {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            background: var(--bg-dark);
+        }
+
+        .attendance-circle-text {
+            position: absolute;
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            font-family: 'Syne', sans-serif;
         }
 
         footer {
@@ -435,7 +413,7 @@
 
         /* Media Queries */
         @media (max-width: 768px) {
-            .grade-summary {
+            .grade-summary, .attendance-summary {
                 flex-direction: column;
                 gap: 30px;
             }
@@ -444,16 +422,9 @@
                 margin: 0 auto;
             }
 
-            .bar {
-                width: 25px;
-            }
-
-            .bar-label {
-                font-size: 10px;
-                transform: rotate(-45deg);
-                transform-origin: top left;
-                left: 12px;
-                bottom: -20px;
+            .attendance-stats {
+                flex-wrap: wrap;
+                justify-content: center;
             }
         }
     </style>
@@ -480,14 +451,6 @@
                 
                 animatedBg.appendChild(bubble);
             }
-
-            // Animate the bars in the chart
-            setTimeout(() => {
-                document.getElementById('bar1').style.height = '180px';
-                document.getElementById('bar2').style.height = '150px';
-                document.getElementById('bar3').style.height = '200px';
-                document.getElementById('bar4').style.height = '130px';
-            }, 500);
 
             // Fetch grades data
             fetchGrades();
@@ -573,26 +536,68 @@
                         </tr>
                         <tr>
                             <td>Quiz 1</td>
-                            <td>Mar 15, 2025</td>
+                            <td>Mar 10, 2025</td>
                             <td>3.0 / 5.0</td>
                             <td><span class="grade-status status-completed">Completed</span></td>
                         </tr>
                         <tr>
                             <td>Assignment 3</td>
-                            <td>Apr 1, 2025</td>
+                            <td>Mar 15, 2025</td>
                             <td>3.0 / 3.0</td>
                             <td><span class="grade-status status-completed">Completed</span></td>
                         </tr>
                         <tr>
                             <td>Assignment 4</td>
-                            <td>Apr 15, 2025</td>
+                            <td>Mar 22, 2025</td>
                             <td>3.0 / 3.0</td>
+                            <td><span class="grade-status status-completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>Assignment 4</td>
+                            <td>Apr 1, 2025</td>
+                            <td>0.0 / 3.0</td>
                             <td><span class="grade-status status-pending">Pending</span></td>
                         </tr>
                         <tr>
                             <td>Assignment 5</td>
-                            <td>May 1, 2025</td>
+                            <td>Apr 5, 2025</td>
                             <td>0.0 / 3.0</td>
+                            <td><span class="grade-status status-pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>Quiz 2</td>
+                            <td>Apr 12, 2025</td>
+                            <td>0.0 / 5.0</td>
+                            <td><span class="grade-status status-pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>Assignment 6</td>
+                            <td>Apr 20, 2025</td>
+                            <td>0.0 / 3.0</td>
+                            <td><span class="grade-status status-pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>Assignment 6</td>
+                            <td>Apr 25, 2025</td>
+                            <td>0.0 / 3.0</td>
+                            <td><span class="grade-status status-pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>Assignment 7</td>
+                            <td>May 5, 2025</td>
+                            <td>0.0 / 3.0</td>
+                            <td><span class="grade-status status-pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>Final Project</td>
+                            <td>May 15, 2025</td>
+                            <td>0.0 / 10.0</td>
+                            <td><span class="grade-status status-pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>Final Exam</td>
+                            <td>May 25, 2025</td>
+                            <td>0.0 / 15.0</td>
                             <td><span class="grade-status status-pending">Pending</span></td>
                         </tr>
                     </tbody>
@@ -600,56 +605,32 @@
             </div>
         </div>
 
-        <!-- Grade Distribution Chart -->
-        <div class="card grade-distribution">
-            <div class="card-header">Assignment Score Distribution</div>
+        <!-- Attendance Card -->
+        <div class="card">
+            <div class="card-header">Attendance Record</div>
             <div class="card-body">
-                <div class="grade-chart-container">
-                    <div class="y-axis">
-                        <div class="y-label">100%</div>
-                        <div class="y-label">75%</div>
-                        <div class="y-label">50%</div>
-                        <div class="y-label">25%</div>
-                        <div class="y-label">0%</div>
+                <div class="attendance-summary">
+                    <div class="attendance-stats">
+                        <div class="attendance-item">
+                            <div class="attendance-value present">15</div>
+                            <div class="attendance-label">Present</div>
+                        </div>
+                        <div class="attendance-item">
+                            <div class="attendance-value late">0</div>
+                            <div class="attendance-label">Late</div>
+                        </div>
+                        <div class="attendance-item">
+                            <div class="attendance-value absent">0</div>
+                            <div class="attendance-label">Absent</div>
+                        </div>
                     </div>
-                    <div class="bar-chart">
-                        <div class="bar-container">
-                            <div id="bar1" class="bar" style="height: 0px;"></div>
-                            <div class="bar-value">75%</div>
-                            <div class="bar-label">Assignment 1</div>
-                        </div>
-                        <div class="bar-container">
-                            <div id="bar2" class="bar" style="height: 0px;"></div>
-                            <div class="bar-value">91.67%</div>
-                            <div class="bar-label">Assignment 2</div>
-                        </div>
-                        <div class="bar-container">
-                            <div id="bar3" class="bar" style="height: 0px;"></div>
-                            <div class="bar-value">60%</div>
-                            <div class="bar-label">Quiz 1</div>
-                        </div>
-                        <div class="bar-container">
-                            <div id="bar4" class="bar" style="height: 0px;"></div>
-                            <div class="bar-value">100%</div>
-                            <div class="bar-label">Assignment 3</div>
-                        </div>
-                        <div class="bar-container">
-                            <div id="bar5" class="bar" style="height: 0px;"></div>
-                            <div class="bar-value">100%</div>
-                            <div class="bar-label">Assignment 4</div>
+                    <div class="grade-chart">
+                        <div class="attendance-circle">
+                            <div class="attendance-circle-text">100%</div>
                         </div>
                     </div>
                 </div>
-                <div class="chart-legend">
-                    <div class="legend-item">
-                        <div class="legend-color legend-assignments"></div>
-                        <span>Assignment Score</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
+
     <footer>
         &copy; 2025 Diyora | Dong-A University
     </footer>
