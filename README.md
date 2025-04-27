@@ -634,9 +634,9 @@
                             <div class="bar-label">Assignment 3</div>
                         </div>
                         <div class="bar-container">
-                            <div id="bar4" class="bar" style="height: 0px;"></div>
+                            <div id="bar5" class="bar" style="height: 0px;"></div>
                             <div class="bar-value">100%</div>
-                            <div class="bar-label">Assignment 3</div>
+                            <div class="bar-label">Assignment 4</div>
                         </div>
                     </div>
                 </div>
