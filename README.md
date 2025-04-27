@@ -634,5 +634,3 @@
     <footer>
         &copy; 2025 Diyora | Dong-A University
     </footer>
-</body>
-</html>
