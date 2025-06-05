@@ -1,636 +1,602 @@
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Diyora's Grade Summary</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Patterns: Solar System Explorer</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Montserrat', sans-serif;
         }
 
-        :root {
-            --primary: #a770ff;
-            --primary-hover: #cf8fff;
-            --bg-dark: #0f0f1e;
-            --text-light: rgba(255, 255, 255, 0.8);
-            --text-mid: rgba(255, 255, 255, 0.6);
-            --card-bg: rgba(15, 15, 30, 0.5);
-        }
-        
-        body {
-            background: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(76, 0, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(255, 0, 128, 0.15) 0%, transparent 50%);
-            color: white;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-            position: relative;
-        }
+```
+    body {
+        font-family: 'Arial', sans-serif;
+        background: radial-gradient(ellipse at center, #0f0f23 0%, #000000 100%);
+        overflow: hidden;
+        color: white;
+    }
 
-        /* Animated background */
-        .animated-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -2;
-            overflow: hidden;
-        }
+    #gameContainer {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+    }
 
-        .animated-bg .bubble {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.1;
-            filter: blur(20px);
-            animation: float 15s infinite linear;
-        }
+    #canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        cursor: pointer;
+    }
 
-        @keyframes float {
-            0% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-50px) rotate(90deg); }
-            50% { transform: translateY(0) rotate(180deg); }
-            75% { transform: translateY(50px) rotate(270deg); }
-            100% { transform: translateY(0) rotate(360deg); }
-        }
-        
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 25px;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            position: relative;
-            z-index: 10;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .navbar h1 {
-            font-family: 'Syne', sans-serif;
-            font-size: 28px;
-            letter-spacing: 2px;
-            font-weight: 600;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, #f0f0f0, var(--primary));
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            position: relative;
-        }
+    #ui {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 20px;
+        border-radius: 15px;
+        border: 2px solid #00ffff;
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        max-width: 300px;
+    }
 
-        .back-button {
-            color: var(--text-light);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+    #challengePanel {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, rgba(25, 25, 112, 0.95), rgba(75, 0, 130, 0.95));
+        padding: 30px;
+        border-radius: 20px;
+        border: 3px solid #ff6b6b;
+        box-shadow: 0 0 50px rgba(255, 107, 107, 0.5);
+        display: none;
+        z-index: 200;
+        max-width: 500px;
+        text-align: center;
+    }
 
-        .back-button:hover {
-            background: rgba(167, 112, 255, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        .container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 0 30px;
-            flex-grow: 1;
-            position: relative;
-        }
-        
-        .card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            position: relative;
-            margin-bottom: 40px;
-        }
-        
-        .card::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffff, #ff00cc);
-            z-index: -1;
-            border-radius: 21px;
-            background-size: 400%;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        
-        .card:hover::before {
-            opacity: 0.5;
-            animation: glowingBorder 8s linear infinite;
-        }
-        
-        @keyframes glowingBorder {
-            0% { background-position: 0 0; }
-            50% { background-position: 400% 0; }
-            100% { background-position: 0 0; }
-        }
-        
-        .card-header {
-            background: rgba(0, 0, 0, 0.2);
-            color: white;
-            padding: 25px 30px;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Syne', sans-serif;
-        }
-        
-        .card-header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-        }
-        
-        .card-body {
-            padding: 35px;
-            color: var(--text-light);
-        }
+    h1 {
+        color: #00ffff;
+        margin-bottom: 15px;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        font-size: 1.2em;
+    }
 
-        /* Grade Summary Section */
-        .grade-summary {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+    h2 {
+        color: #ff6b6b;
+        margin-bottom: 20px;
+        text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+    }
 
-        .grade-info {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+    .stat {
+        margin: 10px 0;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        border-left: 4px solid #00ffff;
+    }
 
-        .grade-title {
-            font-size: 18px;
-            color: var(--text-light);
-            font-weight: 600;
-        }
+    .challenge-option {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+        padding: 15px;
+        background: linear-gradient(45deg, #4a90e2, #357abd);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
 
-        .grade-value {
-            font-size: 42px;
-            font-weight: 700;
-            color: var(--primary);
-            font-family: 'Syne', sans-serif;
-        }
+    .challenge-option:hover {
+        background: linear-gradient(45deg, #357abd, #4a90e2);
+        border-color: #00ffff;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        transform: translateY(-2px);
+    }
 
-        .grade-detail {
-            font-size: 16px;
-            color: var(--text-mid);
-        }
+    .challenge-option.correct {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border-color: #00ff00;
+    }
 
-        .grade-chart {
-            width: 180px;
-            height: 180px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    .challenge-option.incorrect {
+        background: linear-gradient(45deg, #dc3545, #c82333);
+        border-color: #ff0000;
+    }
 
-        .grade-circle {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(var(--primary) 0% 90%, rgba(255, 255, 255, 0.1) 90% 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
+    #nextButton {
+        margin-top: 20px;
+        padding: 12px 25px;
+        background: linear-gradient(45deg, #ff6b6b, #ff5252);
+        border: none;
+        border-radius: 25px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
 
-        .grade-circle::before {
-            content: '';
-            position: absolute;
-            width: 80%;
-            height: 80%;
-            border-radius: 50%;
-            background: var(--bg-dark);
-        }
+    #nextButton:hover {
+        background: linear-gradient(45deg, #ff5252, #ff6b6b);
+        box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        transform: scale(1.05);
+    }
 
-        .grade-circle-text {
-            position: absolute;
-            font-size: 32px;
-            font-weight: 700;
-            color: white;
-            font-family: 'Syne', sans-serif;
-        }
-        
-        /* Grades Table */
-        .grades-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-        }
+    .instructions {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 15px;
+        border-radius: 10px;
+        border: 2px solid #ffff00;
+        box-shadow: 0 0 20px rgba(255, 255, 0, 0.3);
+        max-width: 400px;
+    }
 
-        .grades-table th,
-        .grades-table td {
-            padding: 15px 20px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
+    .particle {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: white;
+        border-radius: 50%;
+        pointer-events: none;
+    }
 
-        .grades-table th {
-            background: rgba(0, 0, 0, 0.2);
-            color: white;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 14px;
-            letter-spacing: 1px;
-        }
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+    }
 
-        .grades-table tr:last-child td {
-            border-bottom: none;
-        }
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
 
-        .grades-table tr:hover {
-            background: rgba(255, 255, 255, 0.03);
-        }
+    .floating {
+        animation: float 4s ease-in-out infinite;
+    }
+</style>
+```
 
-        .grade-status {
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-            text-align: center;
-            display: inline-block;
-            min-width: 100px;
-        }
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="canvas"></canvas>
 
-        .status-completed {
-            background: rgba(46, 213, 115, 0.15);
-            color: #2ed573;
-            border: 1px solid rgba(46, 213, 115, 0.3);
-        }
+```
+    <div id="ui" class="floating">
+        <h1>🌌 Cosmic Patterns Explorer</h1>
+        <div class="stat">Score: <span id="score">0</span></div>
+        <div class="stat">Discoveries: <span id="discoveries">0</span>/8</div>
+        <div class="stat">Pattern Level: <span id="level">Beginner</span></div>
+        <div style="margin-top: 15px; font-size: 14px; color: #ffff00;">
+            Click planets to discover patterns and unlock challenges!
+        </div>
+    </div>
 
-        .status-pending {
-            background: rgba(255, 159, 67, 0.15);
-            color: #ff9f43;
-            border: 1px solid rgba(255, 159, 67, 0.3);
-        }
+    <div id="challengePanel">
+        <h2 id="challengeTitle">Pattern Challenge</h2>
+        <p id="challengeQuestion"></p>
+        <div id="challengeOptions"></div>
+        <button id="nextButton" style="display: none;">Continue Exploring</button>
+    </div>
 
-        .status-missed {
-            background: rgba(255, 71, 87, 0.15);
-            color: #ff4757;
-            border: 1px solid rgba(255, 71, 87, 0.3);
-        }
+    <div class="instructions">
+        <strong>🚀 Mission:</strong> Explore the solar system to uncover cosmic patterns! Each planet holds secrets about gravity, formation, and planetary relationships. Click to investigate!
+    </div>
+</div>
 
-        /* Attendance Section */
-        .attendance-summary {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const ui = document.getElementById('ui');
+    const challengePanel = document.getElementById('challengePanel');
 
-        .attendance-stats {
-            display: flex;
-            gap: 30px;
-        }
+    let gameState = {
+        score: 0,
+        discoveries: 0,
+        level: 'Beginner',
+        currentChallenge: null,
+        discoveredPlanets: new Set(),
+        stars: []
+    };
 
-        .attendance-item {
-            text-align: center;
-        }
+    // Resize canvas
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-        .attendance-value {
-            font-size: 32px;
-            font-weight: 700;
-            font-family: 'Syne', sans-serif;
-            margin-bottom: 8px;
+    // Create starfield
+    function createStars() {
+        gameState.stars = [];
+        for (let i = 0; i < 200; i++) {
+            gameState.stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2 + 0.5,
+                twinkle: Math.random() * Math.PI * 2,
+                speed: Math.random() * 0.02 + 0.01
+            });
         }
+    }
 
-        .present {
-            color: #2ed573;
-        }
-
-        .late {
-            color: #ff9f43;
-        }
-
-        .absent {
-            color: #ff4757;
-        }
-
-        .attendance-label {
-            font-size: 14px;
-            color: var(--text-mid);
-        }
-
-        .attendance-percentage {
-            font-size: 42px;
-            font-weight: 700;
-            color: var(--primary);
-            font-family: 'Syne', sans-serif;
-        }
-
-        .attendance-circle {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(var(--primary) 0% 95%, rgba(255, 255, 255, 0.1) 95% 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        .attendance-circle::before {
-            content: '';
-            position: absolute;
-            width: 80%;
-            height: 80%;
-            border-radius: 50%;
-            background: var(--bg-dark);
-        }
-
-        .attendance-circle-text {
-            position: absolute;
-            font-size: 32px;
-            font-weight: 700;
-            color: white;
-            font-family: 'Syne', sans-serif;
-        }
-
-        footer {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 25px;
-            text-align: center;
-            margin-top: auto;
-            font-size: 14px;
-            letter-spacing: 1px;
-            color: var(--text-mid);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.03);
-        }
-
-        /* Media Queries */
-        @media (max-width: 768px) {
-            .grade-summary, .attendance-summary {
-                flex-direction: column;
-                gap: 30px;
+    // Solar system data with educational content
+    const solarSystem = {
+        sun: { x: 0, y: 0, radius: 30, color: '#ffff00', name: 'Sun' },
+        planets: [
+            {
+                name: 'Mercury', distance: 80, radius: 4, color: '#8c7853',
+                angle: 0, speed: 0.02, moons: 0,
+                facts: "Closest to Sun, extreme temperatures, no atmosphere",
+                pattern: "Small, rocky, no moons due to Sun's gravity"
+            },
+            {
+                name: 'Venus', distance: 120, radius: 6, color: '#ffc649',
+                angle: Math.PI/4, speed: 0.015, moons: 0,
+                facts: "Hottest planet, thick atmosphere, backwards rotation",
+                pattern: "Dense atmosphere traps heat - greenhouse effect"
+            },
+            {
+                name: 'Earth', distance: 160, radius: 7, color: '#4a90e2',
+                angle: Math.PI/2, speed: 0.01, moons: 1,
+                facts: "Perfect distance from Sun, liquid water, one large moon",
+                pattern: "Goldilocks zone - just right for life"
+            },
+            {
+                name: 'Mars', distance: 200, radius: 5, color: '#cd5c5c',
+                angle: Math.PI, speed: 0.008, moons: 2,
+                facts: "Red from iron oxide, polar ice caps, two small moons",
+                pattern: "Thin atmosphere, evidence of ancient water"
+            },
+            {
+                name: 'Jupiter', distance: 300, radius: 20, color: '#d2691e',
+                angle: Math.PI*1.5, speed: 0.004, moons: 79,
+                facts: "Gas giant, Great Red Spot, asteroid protector",
+                pattern: "Massive gravity captures many moons and deflects asteroids"
+            },
+            {
+                name: 'Saturn', distance: 380, radius: 18, color: '#fab1a0',
+                angle: 0, speed: 0.003, moons: 83,
+                facts: "Beautiful rings, less dense than water, many moons",
+                pattern: "Ring system from broken moons and asteroids"
+            },
+            {
+                name: 'Uranus', distance: 450, radius: 12, color: '#74b9ff',
+                angle: Math.PI/3, speed: 0.002, moons: 27,
+                facts: "Tilted on side, methane atmosphere, faint rings",
+                pattern: "Unusual tilt suggests massive ancient collision"
+            },
+            {
+                name: 'Neptune', distance: 520, radius: 11, color: '#0984e3',
+                angle: Math.PI*2/3, speed: 0.0015, moons: 14,
+                facts: "Windiest planet, deep blue color, distant and cold",
+                pattern: "Discovered by mathematical prediction, not observation"
             }
+        ]
+    };
 
-            .grade-chart {
-                margin: 0 auto;
-            }
-
-            .attendance-stats {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
+    // Challenge questions that promote critical thinking
+    const challenges = [
+        {
+            title: "Gravity's Influence",
+            question: "Why does Jupiter have 79 moons while Mercury has none?",
+            options: [
+                "Jupiter is older than Mercury",
+                "Jupiter's massive gravity can capture and hold many objects",
+                "Jupiter is further from the Sun",
+                "Jupiter is made of gas"
+            ],
+            correct: 1,
+            explanation: "Jupiter's enormous mass creates strong gravitational pull that can capture passing objects. Mercury, being small and close to the Sun, can't compete with the Sun's gravity."
+        },
+        {
+            title: "Pattern Recognition",
+            question: "What pattern do you notice about inner vs outer planets?",
+            options: [
+                "Inner planets are larger and have more moons",
+                "Inner planets are small, rocky, with few moons; outer planets are large, gaseous, with many moons",
+                "All planets are the same size",
+                "Outer planets are hotter"
+            ],
+            correct: 1,
+            explanation: "The solar system formed with rocky materials closer to the Sun and gas/ice further out, creating two distinct planetary types."
+        },
+        {
+            title: "Protective Patterns",
+            question: "How does Jupiter protect Earth from asteroids?",
+            options: [
+                "Jupiter blocks asteroids with its rings",
+                "Jupiter's gravity deflects or captures asteroids before they reach inner planets",
+                "Jupiter creates a magnetic field barrier",
+                "Jupiter doesn't protect Earth"
+            ],
+            correct: 1,
+            explanation: "Jupiter acts like a cosmic vacuum cleaner, using its massive gravity to capture or deflect asteroids that might otherwise hit Earth."
+        },
+        {
+            title: "Formation Connections",
+            question: "Why are Saturn's rings likely formed from?",
+            options: [
+                "Dust from space",
+                "Broken apart moons and captured asteroids",
+                "Gas from Saturn's atmosphere",
+                "Light from the Sun"
+            ],
+            correct: 1,
+            explanation: "Saturn's rings are made of ice and rock fragments, likely from moons that got too close and were torn apart by tidal forces."
+        },
+        {
+            title: "Comparative Analysis",
+            question: "What makes Earth special in the 'Goldilocks Zone'?",
+            options: [
+                "It's the biggest planet",
+                "It's the right distance from the Sun for liquid water",
+                "It has the most moons",
+                "It spins the fastest"
+            ],
+            correct: 1,
+            explanation: "Earth sits in the habitable zone where temperatures allow liquid water - not too hot like Venus, not too cold like Mars."
+        },
+        {
+            title: "Scale and Perspective",
+            question: "If Earth were a marble, approximately how big would Jupiter be?",
+            options: [
+                "Another marble",
+                "A ping pong ball",
+                "A basketball",
+                "A softball"
+            ],
+            correct: 2,
+            explanation: "Jupiter is about 11 times wider than Earth. This huge size difference affects everything from gravity to moon systems."
+        },
+        {
+            title: "System Interactions",
+            question: "How did Earth likely get its Moon?",
+            options: [
+                "It was captured from space",
+                "A Mars-sized object collided with early Earth",
+                "It formed at the same time as Earth",
+                "It split off from Earth"
+            ],
+            correct: 1,
+            explanation: "The Giant Impact Hypothesis suggests a Mars-sized object hit Earth, and the debris formed our unusually large Moon."
+        },
+        {
+            title: "Interconnected Systems",
+            question: "How do we discover planets around other stars?",
+            options: [
+                "We see them with telescopes",
+                "We detect tiny brightness changes when they pass in front of their star",
+                "We hear radio signals from them",
+                "We can't discover them"
+            ],
+            correct: 1,
+            explanation: "Most exoplanets are found using the transit method - measuring tiny dips in starlight when planets pass between us and their star."
         }
-    </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Create animated background bubbles
-            const animatedBg = document.querySelector('.animated-bg');
-            const colors = ['#a770ff', '#ff00cc', '#3333ff', '#00ffff'];
+    ];
+
+    function updateUI() {
+        document.getElementById('score').textContent = gameState.score;
+        document.getElementById('discoveries').textContent = gameState.discoveries;
+        
+        const levels = ['Beginner', 'Explorer', 'Astronomer', 'Cosmic Sage'];
+        const levelIndex = Math.min(Math.floor(gameState.discoveries / 2), levels.length - 1);
+        gameState.level = levels[levelIndex];
+        document.getElementById('level').textContent = gameState.level;
+    }
+
+    function drawStars() {
+        gameState.stars.forEach(star => {
+            star.twinkle += star.speed;
+            const brightness = (Math.sin(star.twinkle) + 1) / 2;
             
-            for (let i = 0; i < 20; i++) {
-                const bubble = document.createElement('div');
-                bubble.classList.add('bubble');
-                
-                const size = Math.random() * 200 + 50;
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                
-                bubble.style.width = `${size}px`;
-                bubble.style.height = `${size}px`;
-                bubble.style.left = `${Math.random() * 100}%`;
-                bubble.style.top = `${Math.random() * 100}%`;
-                bubble.style.backgroundColor = color;
-                bubble.style.animationDelay = `${Math.random() * 15}s`;
-                bubble.style.animationDuration = `${15 + Math.random() * 10}s`;
-                
-                animatedBg.appendChild(bubble);
-            }
+            ctx.globalAlpha = brightness * 0.8 + 0.2;
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+    }
 
-            // Fetch grades data
-            fetchGrades();
+    function drawSolarSystem() {
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        // Draw orbits
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 1;
+        solarSystem.planets.forEach(planet => {
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, planet.distance, 0, Math.PI * 2);
+            ctx.stroke();
+        });
+
+        // Draw Sun with glow effect
+        const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, solarSystem.sun.radius * 2);
+        gradient.addColorStop(0, '#ffff00');
+        gradient.addColorStop(0.5, '#ffaa00');
+        gradient.addColorStop(1, 'rgba(255, 170, 0, 0)');
+        
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, solarSystem.sun.radius * 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = solarSystem.sun.color;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, solarSystem.sun.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw planets
+        solarSystem.planets.forEach((planet, index) => {
+            planet.angle += planet.speed;
+            
+            const x = centerX + Math.cos(planet.angle) * planet.distance;
+            const y = centerY + Math.sin(planet.angle) * planet.distance;
+            
+            // Planet glow for discovered planets
+            if (gameState.discoveredPlanets.has(index)) {
+                const glowGradient = ctx.createRadialGradient(x, y, 0, x, y, planet.radius * 3);
+                glowGradient.addColorStop(0, planet.color);
+                glowGradient.addColorStop(1, 'rgba(0, 255, 255, 0)');
+                
+                ctx.fillStyle = glowGradient;
+                ctx.beginPath();
+                ctx.arc(x, y, planet.radius * 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Planet
+            ctx.fillStyle = planet.color;
+            ctx.beginPath();
+            ctx.arc(x, y, planet.radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Planet name for discovered planets
+            if (gameState.discoveredPlanets.has(index)) {
+                ctx.fillStyle = 'white';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(planet.name, x, y - planet.radius - 15);
+            }
+            
+            planet.screenX = x;
+            planet.screenY = y;
+        });
+    }
+
+    function handleClick(event) {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = event.clientX - rect.left;
+        const clickY = event.clientY - rect.top;
+        
+        solarSystem.planets.forEach((planet, index) => {
+            const distance = Math.sqrt(
+                Math.pow(clickX - planet.screenX, 2) + 
+                Math.pow(clickY - planet.screenY, 2)
+            );
+            
+            if (distance <= planet.radius + 10) {
+                if (!gameState.discoveredPlanets.has(index)) {
+                    gameState.discoveredPlanets.add(index);
+                    gameState.discoveries++;
+                    gameState.score += 100;
+                    
+                    // Show challenge
+                    if (challenges[index]) {
+                        showChallenge(challenges[index]);
+                    }
+                    
+                    updateUI();
+                }
+            }
+        });
+    }
+
+    function showChallenge(challenge) {
+        gameState.currentChallenge = challenge;
+        
+        document.getElementById('challengeTitle').textContent = challenge.title;
+        document.getElementById('challengeQuestion').textContent = challenge.question;
+        
+        const optionsContainer = document.getElementById('challengeOptions');
+        optionsContainer.innerHTML = '';
+        
+        challenge.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.className = 'challenge-option';
+            button.textContent = option;
+            button.onclick = () => handleChallengeAnswer(index);
+            optionsContainer.appendChild(button);
         });
         
-        // Function to fetch grades from Google Script
-        function fetchGrades() {
-            const gradesUrl = "https://script.google.com/macros/s/AKfycbzl5muotqZ6wYv5LKIf_fHQ6d46Qday8QAKqLc8H9phdKibwJ7UBdDp3o2-xxC4lkNnqg/exec";
-            
-            fetch(gradesUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Update with actual data if available
-                    console.log("Grades data:", data);
-                })
-                .catch(error => {
-                    console.error('Error fetching grades:', error);
-                });
+        document.getElementById('nextButton').style.display = 'none';
+        challengePanel.style.display = 'block';
+    }
+
+    function handleChallengeAnswer(selectedIndex) {
+        const challenge = gameState.currentChallenge;
+        const buttons = document.querySelectorAll('.challenge-option');
+        
+        buttons.forEach((button, index) => {
+            button.disabled = true;
+            if (index === challenge.correct) {
+                button.classList.add('correct');
+            } else if (index === selectedIndex && index !== challenge.correct) {
+                button.classList.add('incorrect');
+            }
+        });
+        
+        if (selectedIndex === challenge.correct) {
+            gameState.score += 200;
+            updateUI();
         }
-    </script>
-</head>
+        
+        // Show explanation
+        setTimeout(() => {
+            document.getElementById('challengeQuestion').textContent = challenge.explanation;
+            document.getElementById('nextButton').style.display = 'block';
+        }, 1500);
+    }
 
-<body>
-    <div class="animated-bg"></div>
-    
-    <div class="navbar">
-        <a href="https://dioram8.github.io/website/" class="back-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            Back to Portal
-        </a>
-        <h1>Grade Summary</h1>
-        <div style="width: 120px;"></div> <!-- Empty div for flex spacing -->
-    </div>
-    
-    <div class="container">
-        <!-- Overall Grade Summary Card -->
-        <div class="card">
-            <div class="card-header">Overall Performance</div>
-            <div class="card-body">
-                <div class="grade-summary">
-                    <div class="grade-info">
-                        <div class="grade-title">Current Grade</div>
-                        <div class="grade-value">90.32%</div>
-                        <div class="grade-detail">29.00 / 32.00 points</div>
-                    </div>
-                    <div class="grade-chart">
-                        <div class="grade-circle">
-                            <div class="grade-circle-text">90%</div>
-                        </div>
-                    </div>
-                </div>
+    function closeChallenge() {
+        challengePanel.style.display = 'none';
+        gameState.currentChallenge = null;
+    }
 
-                <h3>Detailed Score Breakdown</h3>
-                <table class="grades-table">
-                    <thead>
-                        <tr>
-                            <th>Assignment</th>
-                            <th>Due Date</th>
-                            <th>Points</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Assignment 1</td>
-                            <td>Feb 15, 2025</td>
-                            <td>2.25 / 3.0</td>
-                            <td><span class="grade-status status-completed">Completed</span></td>
-                        </tr>
-                        <tr>
-                            <td>Assignment 2</td>
-                            <td>Mar 1, 2025</td>
-                            <td>2.75 / 3.0</td>
-                            <td><span class="grade-status status-completed">Completed</span></td>
-                        </tr>
-                        <tr>
-                            <td>Quiz 1</td>
-                            <td>Mar 10, 2025</td>
-                            <td>3.0 / 5.0</td>
-                            <td><span class="grade-status status-completed">Completed</span></td>
-                        </tr>
-                        <tr>
-                            <td>Assignment 3</td>
-                            <td>Mar 15, 2025</td>
-                            <td>3.0 / 3.0</td>
-                            <td><span class="grade-status status-completed">Completed</span></td>
-                        </tr>
-                        <tr>
-                            <td>Assignment 4</td>
-                            <td>Mar 22, 2025</td>
-                            <td>3.0 / 3.0</td>
-                            <td><span class="grade-status status-completed">Completed</span></td>
-                        </tr>
-                        <tr>
-                            <td>Assignment 4</td>
-                            <td>Apr 1, 2025</td>
-                            <td>0.0 / 3.0</td>
-                            <td><span class="grade-status status-pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>Assignment 5</td>
-                            <td>Apr 5, 2025</td>
-                            <td>0.0 / 3.0</td>
-                            <td><span class="grade-status status-pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>Quiz 2</td>
-                            <td>Apr 12, 2025</td>
-                            <td>0.0 / 5.0</td>
-                            <td><span class="grade-status status-pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>Assignment 6</td>
-                            <td>Apr 20, 2025</td>
-                            <td>0.0 / 3.0</td>
-                            <td><span class="grade-status status-pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>Assignment 6</td>
-                            <td>Apr 25, 2025</td>
-                            <td>0.0 / 3.0</td>
-                            <td><span class="grade-status status-pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>Assignment 7</td>
-                            <td>May 5, 2025</td>
-                            <td>0.0 / 3.0</td>
-                            <td><span class="grade-status status-pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>Final Project</td>
-                            <td>May 15, 2025</td>
-                            <td>0.0 / 10.0</td>
-                            <td><span class="grade-status status-pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>Final Exam</td>
-                            <td>May 25, 2025</td>
-                            <td>0.0 / 15.0</td>
-                            <td><span class="grade-status status-pending">Pending</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    function gameLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        drawStars();
+        drawSolarSystem();
+        
+        requestAnimationFrame(gameLoop);
+    }
 
-        <!-- Attendance Card -->
-        <div class="card">
-            <div class="card-header">Attendance Record</div>
-            <div class="card-body">
-                <div class="attendance-summary">
-                    <div class="attendance-stats">
-                        <div class="attendance-item">
-                            <div class="attendance-value present">15</div>
-                            <div class="attendance-label">Present</div>
-                        </div>
-                        <div class="attendance-item">
-                            <div class="attendance-value late">0</div>
-                            <div class="attendance-label">Late</div>
-                        </div>
-                        <div class="attendance-item">
-                            <div class="attendance-value absent">0</div>
-                            <div class="attendance-label">Absent</div>
-                        </div>
-                    </div>
-                    <div class="grade-chart">
-                        <div class="attendance-circle">
-                            <div class="attendance-circle-text">100%</div>
-                        </div>
-                    </div>
-                </div>
+    // Event listeners
+    canvas.addEventListener('click', handleClick);
+    document.getElementById('nextButton').addEventListener('click', closeChallenge);
 
-    <footer>
-        &copy; 2025 Diyora | Dong-A University
-    </footer>
+    // Initialize game
+    createStars();
+    updateUI();
+    gameLoop();
+
+    // Add some ambient particles
+    function createParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * window.innerWidth + 'px';
+        particle.style.top = Math.random() * window.innerHeight + 'px';
+        particle.style.animationDelay = Math.random() * 3 + 's';
+        particle.style.animation = 'twinkle 3s infinite';
+        document.body.appendChild(particle);
+        
+        setTimeout(() => {
+            particle.remove();
+        }, 6000);
+    }
+
+    setInterval(createParticle, 500);
+</script>
+```
+
+</body>
+</html>
